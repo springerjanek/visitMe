@@ -7,8 +7,7 @@ import { MODEL_INPUT_SIZE } from "./types";
  * Ładuje obraz z URI, skaluje do MODEL_INPUT_SIZE×MODEL_INPUT_SIZE
  * i zwraca Float32Array w formacie CHW (channels-first), znormalizowany do [0,1].
  *
- * Dekodowanie JPEG odbywa się przez jpeg-js — pure-JS, działa w Hermes
- * bez żadnych API przeglądarki (brak Image, Canvas, OffscreenCanvas).
+ * Dekodowanie JPEG odbywa się przez jpeg-js
  */
 export const imageUriToFloat32CHW = async (
   uri: string,
@@ -41,9 +40,9 @@ export const imageUriToFloat32CHW = async (
   // RGBA HWC → RGB CHW + normalizacja do [0,1]
   const tensor = new Float32Array(3 * pixelCount);
   for (let i = 0; i < pixelCount; i++) {
-    tensor[i] = pixelData[i * 4 + 0] / 255.0;
-    tensor[i + pixelCount] = pixelData[i * 4 + 1] / 255.0;
-    tensor[i + pixelCount * 2] = pixelData[i * 4 + 2] / 255.0;
+    tensor[i] = pixelData[i * 4 + 0] / 255.0; //r
+    tensor[i + pixelCount] = pixelData[i * 4 + 1] / 255.0; //g
+    tensor[i + pixelCount * 2] = pixelData[i * 4 + 2] / 255.0; //b
   }
 
   return tensor;
