@@ -7,28 +7,50 @@ export interface ModelDef {
 }
 
 const ZABKA_CLASSES = ["zabkaNew", "zabkaOld"] as const;
+const BIEDRONKA_CLASSES = ["biedronka"] as const;
 
 export const MODELS: readonly ModelDef[] = [
   {
     id: "zabka-aug-adamw",
-    displayName: "ŻABKA · AUG (AdamW)",
-    source: require("../../assets/models/zabka_AUG_AUTO=AdamW,LR=0.001667.pte"),
+    displayName: "ŻABKA · AUG (AdamW) · LR=0.0016",
+    source: require("../../assets/models/zabka_aug_adamw_lr0001667.pte"),
     classNames: ZABKA_CLASSES,
     shop: "zabka",
   },
   {
     id: "zabka-adamw",
-    displayName: "ŻABKA · AdamW LR.001",
-    source: require("../../assets/models/zabka_LR=0.001,OPTIMIZE=AdamW.pte"),
+    displayName: "ŻABKA · AdamW · LR.001",
+    source: require("../../assets/models/zabka_adamw_lr001.pte"),
     classNames: ZABKA_CLASSES,
     shop: "zabka",
   },
   {
     id: "zabka-auto-adamw",
-    displayName: "ŻABKA · AUTO LR.001",
-    source: require("../../assets/models/zabka_LR=0.001,OPTIMIZER=AUTO=AdamW.pte"),
+    displayName: "ŻABKA · AdamW · LR.001",
+    source: require("../../assets/models/zabka_auto_adamw_lr001.pte"),
     classNames: ZABKA_CLASSES,
     shop: "zabka",
+  },
+  {
+    id: "biedra-auto",
+    displayName: "BIEDRA · AdamW · LR.001",
+    source: require("../../assets/models/biedra_AdamW_0.001.pte"),
+    classNames: BIEDRONKA_CLASSES,
+    shop: "biedronka",
+  },
+  {
+    id: "biedra-augmented",
+    displayName: "BIEDRA · AUG AdamW · LR.001",
+    source: require("../../assets/models/biedra_AUG_AdamW_0.001.pte"),
+    classNames: BIEDRONKA_CLASSES,
+    shop: "biedronka",
+  },
+  {
+    id: "biedra-sgd",
+    displayName: "BIEDRA · SGD · LR.001",
+    source: require("../../assets/models/biedra_SGD_0.001.pte"),
+    classNames: BIEDRONKA_CLASSES,
+    shop: "biedronka",
   },
 ];
 

@@ -26,8 +26,7 @@ export const parseYoloOutput = (
   const numClasses = classNames.length;
   const data = new Float32Array(outputBuffer);
 
-  // [batch, 4+numClasses, anchors] vs. [batch, anchors, 4+numClasses]
-  const transposed = outputSizes[1] !== 4 + numClasses;
+  const transposed = outputSizes[1] > outputSizes[2];
   const numAnchors = transposed ? outputSizes[1] : outputSizes[2];
   const rowStride = transposed ? 4 + numClasses : numAnchors;
 
@@ -70,8 +69,6 @@ export const parseYoloOutput = (
 
     if (bestScore < CONF_THRESHOLD) continue;
 
-    // Model coords (0..MODEL_INPUT_SIZE) → fractions (0..1) of the source image.
-    // Per-axis squish means fractions map 1:1 between model space and original.
     const fx = (cx - w / 2) / MODEL_INPUT_SIZE;
     const fy = (cy - h / 2) / MODEL_INPUT_SIZE;
     const fw = w / MODEL_INPUT_SIZE;
@@ -92,7 +89,6 @@ export const parseYoloOutput = (
   return nms(candidates);
 };
 
-/** IoU dwóch bboxów [x,y,w,h]. */
 const iou = (a: Detection["bbox"], b: Detection["bbox"]): number => {
   const ax2 = a[0] + a[2];
   const ay2 = a[1] + a[3];
@@ -110,7 +106,6 @@ const iou = (a: Detection["bbox"], b: Detection["bbox"]): number => {
   return union > 0 ? inter / union : 0;
 };
 
-/** Greedy NMS po klasach. */
 const nms = (detections: Detection[]): Detection[] => {
   const sorted = [...detections].sort((a, b) => b.confidence - a.confidence);
   const kept: Detection[] = [];
