@@ -54,9 +54,6 @@ export const ModelPicker: React.FC<ModelPickerProps> = ({
               </Text>
               <View style={styles.sheetRowText}>
                 <Text style={styles.sheetRowName}>{m.displayName}</Text>
-                <Text style={styles.sheetRowMeta}>
-                  {m.classNames.length} klas · {m.classNames.join(", ")}
-                </Text>
               </View>
             </TouchableOpacity>
           );
