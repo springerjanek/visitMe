@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-app",
-    "slug": "my-app",
+    "name": "VisitMe",
+    "slug": "VisitMe",
     "scheme": "com.perkek.my-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -12,12 +12,24 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    "assetBundlePatterns": ["**/*"],
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Pozwól aplikacji VisitMe uzywać swojej lokalizacji."
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.perkek.my-app",
       "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera to capture photos and videos.",
-        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone to record audio for video recordings."
+        "NSCameraUsageDescription": "Aplikacja potrzebuje uprawnień do twojej kamery.",
+        "NSMicrophoneUsageDescription": "Aplikacja potrzebuje uprawnień do twojejo mikrofonu",
+        "NSLocationWhenInUseUsageDescription": "Aplikacja sprawdza czy jesteś przy wybranym sklepie, żeby potwierdzić wizytę.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Aplikacja sprawdza czy jesteś przy wybranym sklepie, żeby potwierdzić wizytę.",
+        "NSLocationAlwaysUsageDescription": "Aplikacja sprawdza czy jesteś przy wybranym sklepie, żeby potwierdzić wizytę."
       }
     },
     "android": {
@@ -29,13 +41,26 @@
       },
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
       ],
       "predictiveBackGestureEnabled": false,
       "package": "com.perkek.myapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "056ce73e-d76e-4423-b2f7-352e0d890e32"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/056ce73e-d76e-4423-b2f7-352e0d890e32"
     }
   }
 }
