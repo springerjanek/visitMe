@@ -1,0 +1,8 @@
+# Dataset dla detekcji logo Biedronki
+path: /Users/yan/Desktop/dev/genAI/python/dataset_yolo_biedra
+train: images/train
+val: images/val
+test: images/test
+
+nc: 1 # liczba klas
+names: ["biedronka"] # nazwy klas

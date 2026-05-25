@@ -1,0 +1,7 @@
+Eksperyment: biedra_detector_20260523_121529
+Plik danych: dataset_yolo_biedra/data.yaml
+----------------------------------------
+mAP50: 0.9623
+mAP50-95: 0.8459
+Precision: 1.0000
+Recall: 1.0000

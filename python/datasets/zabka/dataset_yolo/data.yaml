@@ -1,0 +1,8 @@
+# Dataset dla detekcji logo Żabka
+path: /Users/yan/Desktop/dev/genAI/dataset_yolo
+train: images/train
+val: images/val
+test: images/test
+
+nc: 2 # liczba klas
+names: ["zabkaNew", "zabkaOld"] # nazwy klas (0: zabkaNew, 1: zabkaOld)

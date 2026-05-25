@@ -17,6 +17,7 @@ export const formatTicketDate = (d: Date) => ({
 });
 
 export const confidenceBar = (conf: number, slots = 12) => {
-  const filled = Math.round(conf * slots);
+  const clamped = Math.max(0, Math.min(1, isFinite(conf) ? conf : 0));
+  const filled = Math.round(clamped * slots);
   return "▰".repeat(filled) + "▱".repeat(slots - filled);
 };

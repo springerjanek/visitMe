@@ -1,0 +1,3 @@
+Eksperyment: zabka_detector_20260517_154452
+Plik danych: dataset_yolo_augmented/data.yaml
+----------------------------------------

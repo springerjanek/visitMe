@@ -1,0 +1,6 @@
+names: ["zabkaNew", "zabkaOld"]
+nc: 2
+path: /Users/yan/Desktop/dev/genAI/dataset_yolo_augmented
+test: images/test
+train: images/train
+val: images/val
