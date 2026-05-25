@@ -20,8 +20,9 @@ interface TicketProps {
   photoSize: { width: number; height: number };
   detections: Detection[];
   isProcessing: boolean;
-  /** Sieć sklepów (z aktywnego modelu) — zapisywana w `visits.shop`. */
   shop: string;
+  distanceToStore: number | null;
+  geoRadius: number;
   onReset: () => void;
 }
 
@@ -31,10 +32,15 @@ export const Ticket: React.FC<TicketProps> = ({
   detections,
   isProcessing,
   shop,
+  distanceToStore,
+  geoRadius,
   onReset,
 }) => {
   const stamp = useMemo(() => formatTicketDate(new Date()), []);
   const confirmed = !isProcessing && detections.length > 0;
+  const isOutsideStore =
+    distanceToStore !== null && distanceToStore > geoRadius;
+  const canPublish = confirmed && !isOutsideStore;
 
   const topDetection = useMemo(() => {
     if (detections.length === 0) return null;
@@ -114,10 +120,16 @@ export const Ticket: React.FC<TicketProps> = ({
             <DetectionsTable detections={detections} />
           )}
 
+          {distanceToStore !== null &&
+          distanceToStore > geoRadius &&
+          !isProcessing ? (
+            <GeoWarning distanceM={distanceToStore} />
+          ) : null}
+
           <View style={styles.perforation} />
           <FutureRow shop={shop} posted={posted} />
 
-          {confirmed && !posted ? (
+          {canPublish && !posted ? (
             <>
               {postError ? (
                 <Text style={styles.postError}>✕ {postError}</Text>
@@ -237,6 +249,16 @@ const DetectionsTable: React.FC<{ detections: Detection[] }> = ({
     )}
     <View style={styles.hairline} />
   </>
+);
+
+const GeoWarning: React.FC<{ distanceM: number }> = ({ distanceM }) => (
+  <View style={styles.geoWarning}>
+    <Text style={styles.geoWarningTitle}>⚠ POZA SKLEPEM</Text>
+    <Text style={styles.geoWarningSub}>
+      Jesteś ~{Math.round(distanceM)} m od twojego zapisanego sklepu. Udaj się
+      do sklepu aby otrzymać punkty za wizytę.
+    </Text>
+  </View>
 );
 
 const FutureRow: React.FC<{ shop: string; posted: boolean }> = ({
@@ -433,5 +455,29 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 0.5,
     color: COLORS.inkSoft,
+  },
+
+  geoWarning: {
+    borderWidth: 1.5,
+    borderColor: COLORS.stamp,
+    backgroundColor: COLORS.paper,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    marginBottom: 16,
+  },
+  geoWarningTitle: {
+    fontFamily: MONO,
+    fontSize: 11,
+    fontWeight: "900",
+    letterSpacing: 2,
+    color: COLORS.stamp,
+    marginBottom: 4,
+  },
+  geoWarningSub: {
+    fontFamily: MONO,
+    fontSize: 11,
+    color: COLORS.inkSoft,
+    lineHeight: 17,
+    letterSpacing: 0.3,
   },
 });
