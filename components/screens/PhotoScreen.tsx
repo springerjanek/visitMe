@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { Camera, useCameraPermission } from "react-native-vision-camera";
 import { ScalarType, useExecutorchModule } from "react-native-executorch";
+import * as Location from "expo-location";
 
 import {
   DEFAULT_MODEL_ID,
@@ -19,6 +20,8 @@ import {
   imageUriToFloat32CHW,
   parseYoloOutput,
 } from "../../lib/yolo";
+import { useHomeStores } from "../../hooks/useHomeStores";
+import { distanceMeters, GEO_RADIUS_M } from "../../lib/stores";
 
 import { CameraScreen } from "../photo/CameraScreen";
 import { Ticket } from "../photo/Ticket";
@@ -39,9 +42,11 @@ export const Photo: React.FC = () => {
   const [photoSize, setPhotoSize] = useState<PhotoSize | null>(null);
   const [detections, setDetections] = useState<Detection[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [distanceToStore, setDistanceToStore] = useState<number | null>(null);
 
   const activeModel = findModel(selectedModelId);
   const model = useExecutorchModule({ modelSource: activeModel.source });
+  const { stores } = useHomeStores();
 
   useEffect(() => {
     if (!hasPermission) requestPermission();
@@ -51,13 +56,37 @@ export const Photo: React.FC = () => {
     setPhotoUri(null);
     setPhotoSize(null);
     setDetections([]);
+    setDistanceToStore(null);
   }, []);
+
+  const checkProximity = useCallback(
+    async (shop: string) => {
+      const homeStore = stores?.[shop as "zabka" | "biedronka"] ?? null;
+      if (!homeStore) return;
+
+      const loc = await Location.getLastKnownPositionAsync();
+      const coords = loc?.coords ?? null;
+      if (!coords) return;
+
+      const dist = distanceMeters(
+        coords.latitude,
+        coords.longitude,
+        homeStore.lat,
+        homeStore.lng,
+      );
+
+      console.log(dist);
+      setDistanceToStore(dist);
+    },
+    [stores],
+  );
 
   const capture = useCallback(async () => {
     if (!cameraRef.current || isProcessing || !model.isReady) return;
 
     setIsProcessing(true);
     setDetections([]);
+    setDistanceToStore(null);
 
     try {
       const photo = await cameraRef.current.takePhoto({
@@ -66,8 +95,6 @@ export const Photo: React.FC = () => {
       });
       const uri = `file://${photo.path}`;
 
-      // Image.getSize is authoritative for the RN-rendered orientation
-      // (vision-camera reports sensor dims; EXIF rotation can disagree).
       const size = await new Promise<PhotoSize>((resolve) => {
         Image.getSize(
           uri,
@@ -100,9 +127,13 @@ export const Photo: React.FC = () => {
         activeModel.classNames,
       );
       console.log(
-        `📐 Output sizes: [${out.sizes.join(", ")}] — ${found.length} detekcji po NMS`,
+        `📐 Output sizes: [${out.sizes.join(", ")}] — ${found.length} detekcji`,
       );
       setDetections(found);
+
+      if (found.length > 0) {
+        await checkProximity(activeModel.shop);
+      }
     } catch (error: any) {
       console.error("❌ Błąd:", error);
       Alert.alert(
@@ -112,7 +143,7 @@ export const Photo: React.FC = () => {
     } finally {
       setIsProcessing(false);
     }
-  }, [isProcessing, model, activeModel]);
+  }, [isProcessing, model, activeModel, checkProximity]);
 
   if (!hasPermission) {
     return (
@@ -132,6 +163,8 @@ export const Photo: React.FC = () => {
         detections={detections}
         isProcessing={isProcessing}
         shop={activeModel.shop}
+        distanceToStore={distanceToStore}
+        geoRadius={GEO_RADIUS_M}
         onReset={reset}
       />
     );
@@ -149,8 +182,6 @@ export const Photo: React.FC = () => {
     />
   );
 };
-
-// ─── Fallback screens (brak kamery / brak uprawnień) ────────────────────────
 
 interface FallbackProps {
   message: string;

@@ -12,6 +12,8 @@ import { useIsFocused } from "@react-navigation/native";
 
 import { Profile, fetchMyProfile, updateNickname } from "../../lib/profile";
 import { supabase } from "../../lib/supabase";
+import { useHomeStores } from "../../hooks/useHomeStores";
+import { StorePickerScreen } from "./StorePickerScreen";
 
 import { COLORS, MONO } from "../photo/theme";
 
@@ -41,6 +43,9 @@ export const AccountScreen: React.FC = () => {
   const [draftNick, setDraftNick] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const [editingStores, setEditingStores] = useState(false);
+  const { stores, refresh: refreshStores } = useHomeStores();
 
   const load = useCallback(async () => {
     try {
@@ -84,6 +89,20 @@ export const AccountScreen: React.FC = () => {
   const signOut = useCallback(() => {
     supabase.auth.signOut();
   }, []);
+
+  const handleStoresComplete = useCallback(() => {
+    refreshStores();
+    setEditingStores(false);
+  }, [refreshStores]);
+
+  if (editingStores) {
+    return (
+      <StorePickerScreen
+        onComplete={handleStoresComplete}
+        onClose={() => setEditingStores(false)}
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -190,6 +209,16 @@ export const AccountScreen: React.FC = () => {
               );
             })}
           </View>
+
+          <View style={styles.hairline} />
+
+          <TouchableOpacity
+            style={styles.changeStoresBtn}
+            onPress={() => setEditingStores(true)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.changeStoresBtnText}>ZMIEŃ SKLEPY →</Text>
+          </TouchableOpacity>
 
           <View style={styles.perforation} />
 
@@ -382,6 +411,44 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: COLORS.inkSoft,
     marginTop: 2,
+  },
+
+  storeRow: {
+    flexDirection: "row",
+    marginBottom: 14,
+  },
+  storeCell: { flex: 1 },
+  storeDivider: {
+    width: 1,
+    backgroundColor: COLORS.hairline,
+    marginHorizontal: 14,
+    opacity: 0.6,
+  },
+  storeShopLabel: {
+    fontFamily: MONO,
+    fontSize: 9,
+    letterSpacing: 2,
+    color: COLORS.inkSoft,
+    marginBottom: 4,
+  },
+  storeName: {
+    fontFamily: MONO,
+    fontSize: 12,
+    color: COLORS.ink,
+    lineHeight: 17,
+  },
+  changeStoresBtn: {
+    borderWidth: 1,
+    borderColor: COLORS.ink,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  changeStoresBtnText: {
+    fontFamily: MONO,
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 2,
+    color: COLORS.ink,
   },
 
   signOutBtn: {
